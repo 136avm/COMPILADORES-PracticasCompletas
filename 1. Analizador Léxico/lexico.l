@@ -1,3 +1,4 @@
+%option yylineno
 %{
 #include "lexico.h"
 char error_buffer[1024];
@@ -36,7 +37,7 @@ read                                return READ;
 "/"                                 return DIVOP;
 [^a-zA-Z0-9_+\-*/(){};,"= \n\t]     { BEGIN(PANIC); error_buffer[error_buffer_index++] = yytext[0]; }
 <PANIC>[^a-zA-Z0-9_+\-*/(){};,"= \n\t] { error_buffer[error_buffer_index++] = yytext[0]; }
-<PANIC>.                             { error_buffer[error_buffer_index] = '\0'; printf("ERROR LEXICO: Secuencia de caracteres no reconocidos encontrada: %s\n", error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
+<PANIC>.                             { error_buffer[error_buffer_index] = '\0'; printf("ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
 %%
 
 void main() {
@@ -68,14 +69,14 @@ void main() {
                     if(yyleng<=32) {
                         printf("%d [%s, %s]\n",i,"ID",yytext);    
                     } else {
-                        printf("ERROR LÉXICO: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n",yytext,yyleng);
+                        printf("ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
                     }
                     break;
                 case 9:
                     if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
                         printf("%d [%s, %s]\n",i,"INTLITERAL",yytext);
                     } else {
-                        printf("ERROR LÉXICO: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n",yytext);
+                        printf("ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
                     }
                     break;
                 case 10:
