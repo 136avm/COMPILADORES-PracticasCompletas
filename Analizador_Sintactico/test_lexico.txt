@@ -1,0 +1,17 @@
+prueba() {
+    const a=0, b=0;
+    var c=5+2-2147483649;
+    print ("Inicio del programa\n");
+    if (abcdef.?!#lmnopqrstuvwxyzabcdefg) print ("a", "\n");
+    else if (bfytrhrthgfhfgfdsfdrytyfjjtyjhjtr) print ("No a y b\n");
+        else while (c)
+            {
+                print ("c = ",c,"\n");
+                c = c-2+1;
+            }
+    print "Final","\n"
+    //Comentario en una linea
+    /* Comen%&$tario
+    multilinea
+    **/
+}

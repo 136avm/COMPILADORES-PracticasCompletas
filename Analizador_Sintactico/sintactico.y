@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "/home/avm/Escritorio/compiladores/1. Analizador Léxico/lexico.h"
+#include "lexico.h"
 void yyerror();
 extern int yylex();
 %}
