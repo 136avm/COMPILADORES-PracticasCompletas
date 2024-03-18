@@ -1,7 +1,9 @@
+%define parse.error verbose
 %{
 #include <stdio.h>
-void yyerror(char *s);
+void yyerror(const char *s);
 extern int yylex();
+extern int yylineno;
 %}
 
 %union {
@@ -37,7 +39,7 @@ statement_list: statement_list statement
               | /* lambda */
               ;
 
-statement: identifier ASSIGNOP expression SEMICOLON
+statement: ID ASSIGNOP expression SEMICOLON
          | LBRACE statement_list RBRACE
          | IF LPAREN expression RPAREN statement ELSE statement
          | IF LPAREN expression RPAREN statement
@@ -70,8 +72,8 @@ expression: expression PLUSOP expression
 
 %%
 
-void yyerror(char *s) {
-    printf("Se ha producido un error en esta expresion.\n");
+void yyerror(const char *s) {
+    fprintf(stderr, "Error de sintaxis en la línea %d: %s\n", yylineno, s);
 }
 
 int main() {
