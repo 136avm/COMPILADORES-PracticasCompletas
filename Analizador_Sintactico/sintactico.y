@@ -73,7 +73,7 @@ expression: expression PLUSOP expression
 %%
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Error de sintaxis en la línea %d: %s\n", yylineno, s);
+    fprintf(stderr, "ERROR SINTÁCTICO en la línea %d: %s\n", yylineno, s);
 }
 
 int main() {
