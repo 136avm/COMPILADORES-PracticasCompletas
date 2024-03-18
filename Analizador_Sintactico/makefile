@@ -1,13 +1,14 @@
-lexico :	lexico.c
-	gcc lexico.c -lfl -o lexico
+salida :	sintactico.tab.c lex.yy.c
+	gcc sintactico.tab.c lex.yy.c -lfl -o salida
 
-lexico.c :	lexico.l
-	flex -o lexico.c lexico.l
+sintactico.tab.c :	sintactico.y
+	bison -d sintactico.y
 
-all :	lexico
+lex.yy.c :	lexico.l
+	flex lexico.l
 
 clean :
-	rm -f *.c lexico
+	rm -f lex.yy.c sintactico.tab.* salida
 
-run :	lexico test_lexico.txt
-	./lexico < test_lexico.txt
+run :	salida test_lexico.txt
+	./salida < test_lexico.txt

@@ -1,6 +1,6 @@
 %option yylineno
 %{
-#include "lexico.h"
+#include "sintactico.tab.h"
 char error_buffer[1024];
 int error_buffer_index = 0;
 %}
@@ -21,8 +21,16 @@ else                                return ELSE;
 while                               return WHILE;
 print                               return PRINT;
 read                                return READ;
-({letra}|_)({letra}|{digito}|_)*    return ID;
-{entero}                            return INTLITERAL;
+({letra}|_)({letra}|{digito}|_)*    { if(yyleng<=32) {
+                                        return ID;    
+                                    } else {
+                                        printf("ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
+                                    } };
+{entero}                            { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
+                                        return INTLITERAL;
+                                    } else {
+                                        printf("ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
+                                    } };
 \"([^"\n]|{escape})*\"              return CADENA;
 "("                                 return LPAREN;		
 ")"                                 return RPAREN;
@@ -40,7 +48,7 @@ read                                return READ;
 <PANIC>.                             { error_buffer[error_buffer_index] = '\0'; printf("ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
 %%
 
-void main() {
+/*void main() {
     int i;
     while (i=yylex())
         switch (i) {
@@ -117,4 +125,4 @@ void main() {
                     break;
         }
     printf("FIN DE ANALISIS LEXICO\n");
-}
+}*/

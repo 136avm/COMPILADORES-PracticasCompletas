@@ -1,7 +1,6 @@
 %{
 #include <stdio.h>
-#include "lexico.h"
-void yyerror();
+void yyerror(char *s);
 extern int yylex();
 %}
 
@@ -20,7 +19,6 @@ extern int yylex();
 
 program: ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
         ;
-
 
 declarations: declarations VAR identifier_list SEMICOLON
             | declarations CONST identifier_list SEMICOLON
@@ -70,10 +68,13 @@ expression: expression PLUSOP expression
           | INTLITERAL
           ;
 
-
-
 %%
 
-void yyerror() {
-    printf("Se ha producido un error en esta expresion\n");
+void yyerror(char *s) {
+    printf("Se ha producido un error en esta expresion.\n");
+}
+
+int main() {
+    yyparse();
+    return 0;
 }
