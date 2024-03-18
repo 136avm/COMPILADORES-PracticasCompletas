@@ -51,7 +51,7 @@ statement: ID ASSIGNOP expression SEMICOLON
          | PRINT LPAREN print_list RPAREN SEMICOLON
          | READ LPAREN read_list RPAREN SEMICOLON
          | error SEMICOLON
-         | error LBRACE error RBRACE
+         | LBRACE error RBRACE
          | IF LPAREN error RPAREN statement ELSE statement
          | IF LPAREN error RPAREN statement
          | WHILE LPAREN error RPAREN statement
