@@ -24,12 +24,12 @@ read                                return READ;
 ({letra}|_)({letra}|{digito}|_)*    { if(yyleng<=32) {
                                         return ID;    
                                     } else {
-                                        printf("ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
+                                        fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
                                     } };
 {entero}                            { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
                                         return INTLITERAL;
                                     } else {
-                                        printf("ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
+                                        fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
                                     } };
 \"([^"\n]|{escape})*\"              return CADENA;
 "("                                 return LPAREN;		
@@ -45,7 +45,7 @@ read                                return READ;
 "/"                                 return DIVOP;
 [^a-zA-Z0-9_+\-*/(){};,"= \n\t]     { BEGIN(PANIC); error_buffer[error_buffer_index++] = yytext[0]; }
 <PANIC>[^a-zA-Z0-9_+\-*/(){};,"= \n\t] { error_buffer[error_buffer_index++] = yytext[0]; }
-<PANIC>.                             { error_buffer[error_buffer_index] = '\0'; printf("ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
+<PANIC>.                             { error_buffer[error_buffer_index] = '\0'; fprintf(stderr, "ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
 %%
 
 /*void main() {

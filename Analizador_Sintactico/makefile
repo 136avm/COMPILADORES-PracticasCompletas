@@ -10,5 +10,11 @@ lex.yy.c :	lexico.l
 clean :
 	rm -f lex.yy.c sintactico.tab.* salida
 
-run :	salida test_lexico.txt
+test :	salida test_funcional.txt
+	./salida < test_funcional.txt
+
+testLexico : salida test_lexico.txt
 	./salida < test_lexico.txt
+
+testSintactico : salida test_sintactico.txt
+	./salida < test_sintactico.txt

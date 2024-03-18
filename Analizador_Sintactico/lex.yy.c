@@ -867,7 +867,7 @@ YY_RULE_SETUP
 { if(yyleng<=32) {
                                         return ID;    
                                     } else {
-                                        printf("ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
+                                        fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
                                     } };
 	YY_BREAK
 case 12:
@@ -876,7 +876,7 @@ YY_RULE_SETUP
 { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
                                         return INTLITERAL;
                                     } else {
-                                        printf("ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
+                                        fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
                                     } };
 	YY_BREAK
 case 13:
@@ -952,7 +952,7 @@ YY_RULE_SETUP
 case 27:
 YY_RULE_SETUP
 #line 48 "lexico.l"
-{ error_buffer[error_buffer_index] = '\0'; printf("ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
+{ error_buffer[error_buffer_index] = '\0'; fprintf(stderr, "ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
