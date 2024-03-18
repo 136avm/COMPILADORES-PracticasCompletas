@@ -19,3 +19,4 @@
 #define             RBRACE              19
 #define             PRODOP              20
 #define             DIVOP               21
+#define             UMENOS              22
