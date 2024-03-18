@@ -1676,5 +1676,11 @@ int main() {
         printf("El análisis léxico encontró %d errores\n", numErroresLexicos);
     }
 
+    if (numErroresSintacticos == 0 && numErroresLexicos == 0) {
+        printf("El análisis fue exitoso\n");
+    } else {
+        printf("El análisis encontró errores\n");
+    }
+
     return 0;
 }
