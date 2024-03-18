@@ -4,6 +4,8 @@
 void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
+int numErroresSintacticos = 0;
+extern int numErroresLexicos;
 %}
 
 %union {
@@ -19,11 +21,13 @@ extern int yylineno;
 %left UMENOS
 %%
 
-program: ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
+program:   ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
+         | error LBRACE declarations statement_list RBRACE
         ;
 
 declarations: declarations VAR identifier_list SEMICOLON
             | declarations CONST identifier_list SEMICOLON
+            | error SEMICOLON
             | /* lambda */
             ;
 
@@ -46,6 +50,14 @@ statement: ID ASSIGNOP expression SEMICOLON
          | WHILE LPAREN expression RPAREN statement
          | PRINT LPAREN print_list RPAREN SEMICOLON
          | READ LPAREN read_list RPAREN SEMICOLON
+         | error SEMICOLON
+         | error LBRACE
+         | error RPAREN
+         | IF LPAREN error RPAREN statement ELSE statement
+         | IF LPAREN error RPAREN statement
+         | WHILE LPAREN error RPAREN statement
+         | PRINT LPAREN error RPAREN SEMICOLON
+         | READ LPAREN error RPAREN SEMICOLON
          ;
 
 print_list: print_item
@@ -74,9 +86,23 @@ expression: expression PLUSOP expression
 
 void yyerror(const char *s) {
     fprintf(stderr, "ERROR SINTÁCTICO en la línea %d: %s\n", yylineno, s);
+    numErroresSintacticos++;
 }
 
 int main() {
     yyparse();
+
+    if (numErroresSintacticos == 0) {
+        printf("El análisis sintáctico fue exitoso\n");
+    } else {
+        printf("El análisis sintáctico encontró %d errores\n", numErroresSintacticos);
+    }
+
+    if (numErroresLexicos == 0) {
+        printf("El análisis léxico fue exitoso\n");
+    } else {
+        printf("El análisis léxico encontró %d errores\n", numErroresLexicos);
+    }
+
     return 0;
 }

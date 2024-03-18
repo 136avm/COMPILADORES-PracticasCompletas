@@ -2,7 +2,7 @@ prueba() {
     const a=0, b=0;
     var c=5+246456456436456346456436-2;
     print ("Inicio del programa\n");
-    if (abcdefghijklmnopqrstuvwxyz) print ("a","\n");
+    if (abcdefghijklmndgdfgdgdgdfopqrstuvwxyz) print ("a","\n");
     else if (sdf#$%sdb) print ("No a y b\n");
         else while (c)
             {

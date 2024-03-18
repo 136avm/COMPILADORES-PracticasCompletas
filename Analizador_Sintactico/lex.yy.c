@@ -519,9 +519,10 @@ char *yytext;
 #include "sintactico.tab.h"
 char error_buffer[1024];
 int error_buffer_index = 0;
-#line 523 "lex.yy.c"
+int numErroresLexicos = 0;
+#line 524 "lex.yy.c"
 
-#line 525 "lex.yy.c"
+#line 526 "lex.yy.c"
 
 #define INITIAL 0
 #define PANIC 1
@@ -739,9 +740,9 @@ YY_DECL
 		}
 
 	{
-#line 13 "lexico.l"
+#line 14 "lexico.l"
 
-#line 745 "lex.yy.c"
+#line 746 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -811,155 +812,157 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 14 "lexico.l"
+#line 15 "lexico.l"
 ;
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 15 "lexico.l"
+#line 16 "lexico.l"
 ;
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 16 "lexico.l"
+#line 17 "lexico.l"
 ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "lexico.l"
+#line 18 "lexico.l"
 return VAR;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 18 "lexico.l"
+#line 19 "lexico.l"
 return CONST;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 19 "lexico.l"
+#line 20 "lexico.l"
 return IF;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 20 "lexico.l"
+#line 21 "lexico.l"
 return ELSE;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 21 "lexico.l"
+#line 22 "lexico.l"
 return WHILE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 22 "lexico.l"
+#line 23 "lexico.l"
 return PRINT;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 23 "lexico.l"
+#line 24 "lexico.l"
 return READ;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 24 "lexico.l"
+#line 25 "lexico.l"
 { if(yyleng<=32) {
                                         return ID;    
                                     } else {
                                         fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
+                                        numErroresLexicos++;
                                     } };
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "lexico.l"
+#line 31 "lexico.l"
 { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
                                         return INTLITERAL;
                                     } else {
                                         fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
+                                        numErroresLexicos++;
                                     } };
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 34 "lexico.l"
+#line 37 "lexico.l"
 return CADENA;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 35 "lexico.l"
+#line 38 "lexico.l"
 return LPAREN;		
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "lexico.l"
+#line 39 "lexico.l"
 return RPAREN;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 37 "lexico.l"
+#line 40 "lexico.l"
 return SEMICOLON;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 38 "lexico.l"
+#line 41 "lexico.l"
 return COMMA;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 39 "lexico.l"
+#line 42 "lexico.l"
 return ASSIGNOP;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 40 "lexico.l"
+#line 43 "lexico.l"
 return PLUSOP;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 41 "lexico.l"
+#line 44 "lexico.l"
 return MINUSOP;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 42 "lexico.l"
+#line 45 "lexico.l"
 return LBRACE;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 43 "lexico.l"
+#line 46 "lexico.l"
 return RBRACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 44 "lexico.l"
+#line 47 "lexico.l"
 return PRODOP;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 45 "lexico.l"
+#line 48 "lexico.l"
 return DIVOP;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 46 "lexico.l"
+#line 49 "lexico.l"
 { BEGIN(PANIC); error_buffer[error_buffer_index++] = yytext[0]; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 47 "lexico.l"
+#line 50 "lexico.l"
 { error_buffer[error_buffer_index++] = yytext[0]; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 48 "lexico.l"
-{ error_buffer[error_buffer_index] = '\0'; fprintf(stderr, "ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); }
+#line 51 "lexico.l"
+{ error_buffer[error_buffer_index] = '\0'; fprintf(stderr, "ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); numErroresLexicos++; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 49 "lexico.l"
+#line 52 "lexico.l"
 ECHO;
 	YY_BREAK
-#line 963 "lex.yy.c"
+#line 966 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(PANIC):
 	yyterminate();
@@ -1977,84 +1980,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 49 "lexico.l"
+#line 52 "lexico.l"
 
-
-/*void main() {
-    int i;
-    while (i=yylex())
-        switch (i) {
-                case 1:
-                    printf("%d [%s, ]\n",i,"VAR");
-                    break;
-                case 2:
-                    printf("%d [%s, ]\n",i,"CONST");
-                    break;
-                case 3:
-                    printf("%d [%s, ]\n",i,"IF");
-                    break;
-                case 4:
-                    printf("%d [%s, ]\n",i,"ELSE");
-                    break;
-                case 5:
-                    printf("%d [%s, ]\n",i,"WHILE");
-                    break;
-                case 6:
-                    printf("%d [%s, ]\n",i,"PRINT");
-                    break;
-                case 7:
-                    printf("%d [%s, ]\n",i,"READ");
-                    break;
-                case 8:
-                    if(yyleng<=32) {
-                        printf("%d [%s, %s]\n",i,"ID",yytext);    
-                    } else {
-                        printf("ERROR LÉXICO en la línea %d: \"%s\" con longitud %d. La cadena no puede exceder de 32 caracteres.\n", yylineno,yytext,yyleng);
-                    }
-                    break;
-                case 9:
-                    if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
-                        printf("%d [%s, %s]\n",i,"INTLITERAL",yytext);
-                    } else {
-                        printf("ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
-                    }
-                    break;
-                case 10:
-                    printf("%d [%s, %s]\n",i,"CADENA",yytext);
-                    break;
-                case 11:
-                    printf("%d [%s, ]\n",i,"LPAREN");
-                    break;
-                case 12:
-                    printf("%d [%s, ]\n",i,"RPAREN");
-                    break;
-                case 13:
-                    printf("%d [%s, ]\n",i,"SEMICOLON");
-                    break;
-                case 14:
-                    printf("%d [%s, ]\n",i,"COMMA");
-                    break;
-                case 15:
-                    printf("%d [%s, ]\n",i,"ASSIGNOP");
-                    break;
-                case 16:
-                    printf("%d [%s, ]\n",i,"PLUSOP");
-                    break;
-                case 17:
-                    printf("%d [%s, ]\n",i,"MINUSOP");
-                    break;
-                case 18:
-                    printf("%d [%s, ]\n",i,"LBRACE");
-                    break;
-                case 19:
-                    printf("%d [%s, ]\n",i,"RBRACE");
-                    break;
-                case 20:
-                    printf("%d [%s, ]\n",i,"PRODOP");
-                    break;
-                case 21:
-                    printf("%d [%s, ]\n",i,"DIVOP");
-                    break;
-        }
-    printf("FIN DE ANALISIS LEXICO\n");
-}*/

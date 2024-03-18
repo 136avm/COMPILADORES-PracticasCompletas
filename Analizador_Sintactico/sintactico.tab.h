@@ -84,7 +84,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 9 "sintactico.y"
+#line 11 "sintactico.y"
 
     int entero;
     char *cadena;

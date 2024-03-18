@@ -1,18 +1,20 @@
-prueba() {
+prueba( {
     const a=0, b=0;
-    var c=5+2-2;
+    var c=5+2-2
     print ("Inicio del programa\n");
-    if (a) print ("a","\n");
+    if (23++45) print ("a","\n")
     else if (b) print ("No a y b\n");
         else while (c)
             {
                 print ("c = ",c,"\n");
-                c = c-2+1;
+                c = c-2+1
             }
-    print ("Final","\n")
+    print "Final","\n")
     // Comentario en una línea
     /*
     Comentario
     multilinea
     */
+    c = 34+56;
+    c = 45
 }
