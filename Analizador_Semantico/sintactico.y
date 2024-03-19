@@ -76,7 +76,7 @@ print_list: print_item
           ;
 
 print_item: expression
-          | CADENA      { if(!perteneceTS($1)) {insertar($1, STRING); contCadenas++;} }
+          | CADENA      { insertar($1, STRING); contCadenas++; }
           ;
 
 read_list: ID                                                       { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }

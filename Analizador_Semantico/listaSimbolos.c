@@ -109,7 +109,7 @@ void imprimirLS(Lista lista) {
   p = lista->cabecera->sig;
   while (p != NULL) {
     if (p->dato.tipo == VARIABLE || p->dato.tipo == CONSTANTE) {
-      printf("_%s\n\t.word 0\n", p->dato.nombre);
+      printf("_%s:\n\t.word 0\n", p->dato.nombre);
     }
     p = p->sig;
   }

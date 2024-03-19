@@ -1486,7 +1486,7 @@ yyreduce:
 
   case 34: /* print_item: CADENA  */
 #line 79 "sintactico.y"
-                        { if(!perteneceTS((yyvsp[0].cadena))) {insertar((yyvsp[0].cadena), STRING); contCadenas++;} }
+                        { insertar((yyvsp[0].cadena), STRING); contCadenas++; }
 #line 1491 "sintactico.tab.c"
     break;
 
