@@ -21,9 +21,9 @@ extern int numErroresLexicos;
 %left UMENOS
 %%
 
-program:   ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
-         | error LBRACE declarations statement_list RBRACE
-        ;
+program: ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
+       | error LBRACE declarations statement_list RBRACE
+       ;
 
 declarations: declarations VAR identifier_list SEMICOLON
             | declarations CONST identifier_list SEMICOLON
