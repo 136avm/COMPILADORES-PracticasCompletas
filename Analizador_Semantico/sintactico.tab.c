@@ -1480,7 +1480,7 @@ yyreduce:
   case 17: /* statement: ID ASSIGNOP expression SEMICOLON  */
 #line 57 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
-                                                                      else if(esConstante((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; numErroresSemanticos++;  } }
+                                                                      else if(esConstante((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } }
 #line 1485 "sintactico.tab.c"
     break;
 

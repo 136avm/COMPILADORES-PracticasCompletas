@@ -55,7 +55,7 @@ statement_list: statement_list statement
               ;
 
 statement: ID ASSIGNOP expression SEMICOLON                         { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
-                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; numErroresSemanticos++;  } }
+                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } }
          | LBRACE statement_list RBRACE
          | IF LPAREN expression RPAREN statement ELSE statement
          | IF LPAREN expression RPAREN statement
