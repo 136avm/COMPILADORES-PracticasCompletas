@@ -10,14 +10,14 @@ lex.yy.c :	lexico.l
 clean :
 	rm -f lex.yy.c sintactico.tab.* salida
 
-test :	salida test_funcional.txt
-	./salida test_funcional.txt
+test :	miCompilador test_funcional.txt
+	./miCompilador test_funcional.txt
 
-testLexico : salida test_lexico.txt
-	./salida test_lexico.txt
+testLexico : miCompilador test_lexico.txt
+	./miCompilador test_lexico.txt
 
-testSintactico : salida test_sintactico.txt
-	./salida test_sintactico.txt
+testSintactico : miCompilador test_sintactico.txt
+	./miCompilador test_sintactico.txt
 
-testSemantico : salida test_semantico.txt
-	./salida test_semantico.txt
+testSemantico : miCompilador test_semantico.txt
+	./miCompilador test_semantico.txt

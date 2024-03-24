@@ -1806,7 +1806,7 @@ int main(int argc, char *argv[]) {
     if (numErroresSintacticos == 0 && numErroresLexicos == 0 && numErroresSemanticos == 0) {
         printf("El análisis fue exitoso\n");
     } else {
-        printf("El análisis encontró errores\n");
+        printf("El análisis encontró %d errores\n", numErroresSintacticos + numErroresLexicos + numErroresSemanticos);
     }
 
     printf("\nLa cabecera del código ensamblador es: \n\n");
