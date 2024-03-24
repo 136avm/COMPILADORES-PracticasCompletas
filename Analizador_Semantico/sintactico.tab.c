@@ -71,6 +71,7 @@
 
 #include <stdio.h>
 #include "listaSimbolos.h"
+#include <stdlib.h>
 void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
@@ -83,8 +84,12 @@ void insertar(char *id, Tipo tipo);
 int perteneceTS(char *id);
 int esConstante(char *id);
 int numErroresSemanticos = 0;
+extern char *yytext;
+extern FILE *yyin;
+extern int yyparse();
+extern int yyleng();
 
-#line 88 "sintactico.tab.c"
+#line 93 "sintactico.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -538,11 +543,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    33,    33,    33,    34,    37,    37,    38,    38,    39,
-      40,    43,    44,    47,    49,    53,    54,    57,    59,    60,
-      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
-      71,    74,    75,    78,    79,    82,    84,    88,    89,    90,
-      91,    92,    93,    94,    95
+       0,    38,    38,    38,    39,    42,    42,    43,    43,    44,
+      45,    48,    49,    52,    54,    58,    59,    62,    64,    65,
+      66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
+      76,    79,    80,    83,    84,    87,    89,    93,    94,    95,
+      96,    97,    98,    99,   100
 };
 #endif
 
@@ -1446,72 +1451,72 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 33 "sintactico.y"
+#line 38 "sintactico.y"
          { tabSimb = creaLS(); }
-#line 1452 "sintactico.tab.c"
+#line 1457 "sintactico.tab.c"
     break;
 
   case 5: /* $@2: %empty  */
-#line 37 "sintactico.y"
+#line 42 "sintactico.y"
                                { tipo=VARIABLE; }
-#line 1458 "sintactico.tab.c"
+#line 1463 "sintactico.tab.c"
     break;
 
   case 7: /* $@3: %empty  */
-#line 38 "sintactico.y"
+#line 43 "sintactico.y"
                                  { tipo=CONSTANTE; }
-#line 1464 "sintactico.tab.c"
+#line 1469 "sintactico.tab.c"
     break;
 
   case 13: /* identifier: ID  */
-#line 47 "sintactico.y"
+#line 52 "sintactico.y"
                                         { if(!perteneceTS((yyvsp[0].cadena))) {insertar((yyvsp[0].cadena), tipo);}
                                           else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1471 "sintactico.tab.c"
+#line 1476 "sintactico.tab.c"
     break;
 
   case 14: /* identifier: ID ASSIGNOP expression  */
-#line 49 "sintactico.y"
+#line 54 "sintactico.y"
                                         { if(!perteneceTS((yyvsp[-2].cadena))) {insertar((yyvsp[-2].cadena), tipo);}
                                           else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1478 "sintactico.tab.c"
+#line 1483 "sintactico.tab.c"
     break;
 
   case 17: /* statement: ID ASSIGNOP expression SEMICOLON  */
-#line 57 "sintactico.y"
+#line 62 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } }
-#line 1485 "sintactico.tab.c"
+#line 1490 "sintactico.tab.c"
     break;
 
   case 34: /* print_item: CADENA  */
-#line 79 "sintactico.y"
+#line 84 "sintactico.y"
                         { insertar((yyvsp[0].cadena), STRING); contCadenas++; }
-#line 1491 "sintactico.tab.c"
+#line 1496 "sintactico.tab.c"
     break;
 
   case 35: /* read_list: ID  */
-#line 82 "sintactico.y"
+#line 87 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }
-#line 1498 "sintactico.tab.c"
+#line 1503 "sintactico.tab.c"
     break;
 
   case 36: /* read_list: read_list COMMA ID  */
-#line 84 "sintactico.y"
+#line 89 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }
-#line 1505 "sintactico.tab.c"
+#line 1510 "sintactico.tab.c"
     break;
 
   case 43: /* expression: ID  */
-#line 94 "sintactico.y"
+#line 99 "sintactico.y"
                                                                      { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1511 "sintactico.tab.c"
+#line 1516 "sintactico.tab.c"
     break;
 
 
-#line 1515 "sintactico.tab.c"
+#line 1520 "sintactico.tab.c"
 
       default: break;
     }
@@ -1735,7 +1740,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 98 "sintactico.y"
+#line 103 "sintactico.y"
 
 
 void yyerror(const char *s) {
@@ -1759,8 +1764,26 @@ int esConstante(char *id) {
     return s.tipo == CONSTANTE;
 }
 
-int main() {
+void imprimirCabecera(){
+    printf("##################\n");
+    printf("# Seccion de datos\n");
+    printf("\t.data\n\n");
+    imprimirLS(tabSimb);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2){
+        printf("Uso correcto: %s fichero\n", argv[0]);
+        exit(1);
+    }
+    FILE *fitch = fopen(argv[1], "r");
+    if (fitch == 0) {
+        printf("No se pudo abrir el fichero %s\n", argv[1]);
+        exit(1);
+    }
+    yyin = fitch;
     yyparse();
+    fclose(fitch);
 
     if (numErroresSintacticos == 0) {
         printf("El análisis sintáctico fue exitoso\n");
@@ -1786,8 +1809,8 @@ int main() {
         printf("El análisis encontró errores\n");
     }
 
-    printf("La tabla de símbolos es: \n");
-    imprimirLS(tabSimb);
+    printf("\nLa cabecera del código ensamblador es: \n\n");
+    imprimirCabecera();
     liberaLS(tabSimb);
 
     return 0;

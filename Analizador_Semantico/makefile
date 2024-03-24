@@ -1,5 +1,5 @@
-salida :	sintactico.tab.c lex.yy.c listaSimbolos.c
-	gcc sintactico.tab.c lex.yy.c listaSimbolos.c -lfl -o salida
+miCompilador :	sintactico.tab.c lex.yy.c listaSimbolos.c
+	gcc sintactico.tab.c lex.yy.c listaSimbolos.c -lfl -o miCompilador
 
 sintactico.tab.c :	sintactico.y listaSimbolos.h
 	bison -d sintactico.y
@@ -11,13 +11,13 @@ clean :
 	rm -f lex.yy.c sintactico.tab.* salida
 
 test :	salida test_funcional.txt
-	./salida < test_funcional.txt
+	./salida test_funcional.txt
 
 testLexico : salida test_lexico.txt
-	./salida < test_lexico.txt
+	./salida test_lexico.txt
 
 testSintactico : salida test_sintactico.txt
-	./salida < test_sintactico.txt
+	./salida test_sintactico.txt
 
 testSemantico : salida test_semantico.txt
-	./salida < test_semantico.txt
+	./salida test_semantico.txt

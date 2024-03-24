@@ -2,6 +2,7 @@
 %{
 #include <stdio.h>
 #include "listaSimbolos.h"
+#include <stdlib.h>
 void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
@@ -14,6 +15,10 @@ void insertar(char *id, Tipo tipo);
 int perteneceTS(char *id);
 int esConstante(char *id);
 int numErroresSemanticos = 0;
+extern char *yytext;
+extern FILE *yyin;
+extern int yyparse();
+extern int yyleng();
 %}
 
 %union {
@@ -118,8 +123,26 @@ int esConstante(char *id) {
     return s.tipo == CONSTANTE;
 }
 
-int main() {
+void imprimirCabecera(){
+    printf("##################\n");
+    printf("# Seccion de datos\n");
+    printf("\t.data\n\n");
+    imprimirLS(tabSimb);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2){
+        printf("Uso correcto: %s fichero\n", argv[0]);
+        exit(1);
+    }
+    FILE *fitch = fopen(argv[1], "r");
+    if (fitch == 0) {
+        printf("No se pudo abrir el fichero %s\n", argv[1]);
+        exit(1);
+    }
+    yyin = fitch;
     yyparse();
+    fclose(fitch);
 
     if (numErroresSintacticos == 0) {
         printf("El análisis sintáctico fue exitoso\n");
@@ -145,8 +168,8 @@ int main() {
         printf("El análisis encontró errores\n");
     }
 
-    printf("La tabla de símbolos es: \n");
-    imprimirLS(tabSimb);
+    printf("\nLa cabecera del código ensamblador es: \n\n");
+    imprimirCabecera();
     liberaLS(tabSimb);
 
     return 0;
