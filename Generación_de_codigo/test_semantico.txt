@@ -1,0 +1,20 @@
+prueba() {
+    const a=0, b=0, a=2;
+    var c=5+2-2;
+    var c=3;
+    print ("Inicio del programa\n");
+    if (d) print ("a","\n");
+    else if (b) print ("No a y b\n");
+        else while (c)
+            {
+                print ("c = ",c,"\n");
+                c = c-2+1;
+                a = 3;
+            }
+    print ("Final","\n");
+    // Comentario en una línea
+    /*
+    Comentario
+    multilinea
+    */
+}
