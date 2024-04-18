@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "listaSimbolos.h"
 #include <stdlib.h>
-#include "listaCodigo.h"
 void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
@@ -21,6 +20,10 @@ extern FILE *yyin;
 extern int yyparse();
 extern int yyleng();
 %}
+
+%code requires{
+    #include "listaCodigo.h"
+}
 
 %union {
     int entero;

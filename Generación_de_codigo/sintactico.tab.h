@@ -44,6 +44,12 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 24 "sintactico.y"
+
+    #include "listaCodigo.h"
+
+#line 53 "sintactico.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -84,13 +90,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 25 "sintactico.y"
+#line 28 "sintactico.y"
 
     int entero;
     char *cadena;
     ListaC codigo;
 
-#line 94 "sintactico.tab.h"
+#line 100 "sintactico.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

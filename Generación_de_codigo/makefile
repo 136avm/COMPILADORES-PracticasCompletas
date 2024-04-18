@@ -4,7 +4,7 @@ miCompilador :	sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c
 sintactico.tab.c :	sintactico.y listaSimbolos.h listaCodigo.h
 	bison -d sintactico.y
 
-lex.yy.c :	lexico.l listaCodigo.h
+lex.yy.c :	lexico.l
 	flex lexico.l
 
 clean :

@@ -1,7 +1,6 @@
 %option yylineno
 %{
 #include "sintactico.tab.h"
-#include "listaCodigo.h"
 char error_buffer[1024];
 int error_buffer_index = 0;
 int numErroresLexicos = 0;
