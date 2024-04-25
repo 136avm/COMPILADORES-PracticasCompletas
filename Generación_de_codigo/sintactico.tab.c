@@ -70,7 +70,9 @@
 #line 2 "sintactico.y"
 
 #include <stdio.h>
+#include <string.h>
 #include "listaSimbolos.h"
+#include "listaCodigo.h"
 #include <stdlib.h>
 void yyerror(const char *s);
 extern int yylex();
@@ -88,8 +90,14 @@ extern char *yytext;
 extern FILE *yyin;
 extern int yyparse();
 extern int yyleng();
+int regs[10] = {0,0,0,0,0,0,0,0,0,0};
+char * regsDevolver[10] = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
+char * obtenerReg();
+char * concatena();
+void liberarReg(char * reg);
+void imprimirCodigo(ListaC codigo);
 
-#line 93 "sintactico.tab.c"
+#line 101 "sintactico.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -541,13 +549,13 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45,    45,    46,    49,    49,    50,    50,    51,
-      52,    55,    56,    59,    61,    65,    66,    69,    71,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    86,    87,    90,    91,    94,    96,   100,   101,   102,
-     103,   104,   105,   106,   107
+       0,    53,    53,    53,    54,    57,    57,    58,    58,    59,
+      60,    63,    64,    67,    69,    73,    74,    77,    79,    80,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    94,    95,    98,    99,   102,   104,   108,   118,   128,
+     138,   148,   155,   156,   165
 };
 #endif
 
@@ -1451,72 +1459,171 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 45 "sintactico.y"
+#line 53 "sintactico.y"
          { tabSimb = creaLS(); }
-#line 1457 "sintactico.tab.c"
+#line 1465 "sintactico.tab.c"
     break;
 
   case 5: /* $@2: %empty  */
-#line 49 "sintactico.y"
+#line 57 "sintactico.y"
                                { tipo=VARIABLE; }
-#line 1463 "sintactico.tab.c"
+#line 1471 "sintactico.tab.c"
     break;
 
   case 7: /* $@3: %empty  */
-#line 50 "sintactico.y"
+#line 58 "sintactico.y"
                                  { tipo=CONSTANTE; }
-#line 1469 "sintactico.tab.c"
+#line 1477 "sintactico.tab.c"
     break;
 
   case 13: /* identifier: ID  */
-#line 59 "sintactico.y"
+#line 67 "sintactico.y"
                                         { if(!perteneceTS((yyvsp[0].cadena))) {insertar((yyvsp[0].cadena), tipo);}
                                           else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1476 "sintactico.tab.c"
+#line 1484 "sintactico.tab.c"
     break;
 
   case 14: /* identifier: ID ASSIGNOP expression  */
-#line 61 "sintactico.y"
+#line 69 "sintactico.y"
                                         { if(!perteneceTS((yyvsp[-2].cadena))) {insertar((yyvsp[-2].cadena), tipo);}
                                           else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1483 "sintactico.tab.c"
+#line 1491 "sintactico.tab.c"
     break;
 
   case 17: /* statement: ID ASSIGNOP expression SEMICOLON  */
-#line 69 "sintactico.y"
+#line 77 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[-3].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } }
-#line 1490 "sintactico.tab.c"
+#line 1498 "sintactico.tab.c"
     break;
 
   case 34: /* print_item: CADENA  */
-#line 91 "sintactico.y"
+#line 99 "sintactico.y"
                         { insertar((yyvsp[0].cadena), STRING); contCadenas++; }
-#line 1496 "sintactico.tab.c"
+#line 1504 "sintactico.tab.c"
     break;
 
   case 35: /* read_list: ID  */
-#line 94 "sintactico.y"
+#line 102 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }
-#line 1503 "sintactico.tab.c"
+#line 1511 "sintactico.tab.c"
     break;
 
   case 36: /* read_list: read_list COMMA ID  */
-#line 96 "sintactico.y"
+#line 104 "sintactico.y"
                                                                     { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
                                                                       else if(esConstante((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }
-#line 1510 "sintactico.tab.c"
+#line 1518 "sintactico.tab.c"
+    break;
+
+  case 37: /* expression: expression PLUSOP expression  */
+#line 108 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[-2].codigo);
+                                                concatenaLC((yyval.codigo), (yyvsp[0].codigo));
+                                                Operacion oper;
+                                                oper.op = "add";
+                                                oper.res = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg1 = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg2 = recuperaResLC((yyvsp[0].codigo));
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                liberaLC((yyvsp[0].codigo));
+                                                liberarReg(oper.arg2);}
+#line 1533 "sintactico.tab.c"
+    break;
+
+  case 38: /* expression: expression MINUSOP expression  */
+#line 118 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[-2].codigo);
+                                                concatenaLC((yyval.codigo), (yyvsp[0].codigo));
+                                                Operacion oper;
+                                                oper.op = "sub";
+                                                oper.res = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg1 = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg2 = recuperaResLC((yyvsp[0].codigo));
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                liberaLC((yyvsp[0].codigo));
+                                                liberarReg(oper.arg2);}
+#line 1548 "sintactico.tab.c"
+    break;
+
+  case 39: /* expression: expression PRODOP expression  */
+#line 128 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[-2].codigo);
+                                                concatenaLC((yyval.codigo), (yyvsp[0].codigo));
+                                                Operacion oper;
+                                                oper.op = "mul";
+                                                oper.res = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg1 = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg2 = recuperaResLC((yyvsp[0].codigo));
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                liberaLC((yyvsp[0].codigo));
+                                                liberarReg(oper.arg2);}
+#line 1563 "sintactico.tab.c"
+    break;
+
+  case 40: /* expression: expression DIVOP expression  */
+#line 138 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[-2].codigo);
+                                                concatenaLC((yyval.codigo), (yyvsp[0].codigo));
+                                                Operacion oper;
+                                                oper.op = "div";
+                                                oper.res = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg1 = recuperaResLC((yyvsp[-2].codigo));
+                                                oper.arg2 = recuperaResLC((yyvsp[0].codigo));
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                liberaLC((yyvsp[0].codigo));
+                                                liberarReg(oper.arg2);}
+#line 1578 "sintactico.tab.c"
+    break;
+
+  case 41: /* expression: MINUSOP expression  */
+#line 148 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[0].codigo);
+                                                Operacion oper;
+                                                oper.op = "neg";
+                                                oper.res = recuperaResLC((yyvsp[0].codigo));
+                                                oper.arg1 = recuperaResLC((yyvsp[0].codigo));
+                                                oper.arg2 = NULL;
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);}
+#line 1590 "sintactico.tab.c"
+    break;
+
+  case 42: /* expression: LPAREN expression RPAREN  */
+#line 155 "sintactico.y"
+                                               {(yyval.codigo) = (yyvsp[-1].codigo);}
+#line 1596 "sintactico.tab.c"
     break;
 
   case 43: /* expression: ID  */
-#line 106 "sintactico.y"
-                                                                     { if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; } }
-#line 1516 "sintactico.tab.c"
+#line 156 "sintactico.y"
+                                               {if(!perteneceTS((yyvsp[0].cadena))) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; } 
+                                                (yyval.codigo) = creaLC();
+                                                Operacion oper;
+                                                oper.op = "lw";
+                                                oper.res = obtenerReg();
+                                                oper.arg1 = concatena("_",(yyvsp[0].cadena));
+                                                oper.arg2 = NULL;
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                guardaResLC((yyval.codigo), oper.res);}
+#line 1610 "sintactico.tab.c"
+    break;
+
+  case 44: /* expression: INTLITERAL  */
+#line 165 "sintactico.y"
+                                               {(yyval.codigo) = creaLC();
+                                                Operacion oper;
+                                                oper.op = "li";
+                                                oper.res = obtenerReg();
+                                                oper.arg1 = (yyvsp[0].entero);
+                                                oper.arg2 = NULL;
+                                                insertaLC((yyval.codigo), finalLC((yyval.codigo)), oper);
+                                                guardaResLC((yyval.codigo), oper.res);}
+#line 1623 "sintactico.tab.c"
     break;
 
 
-#line 1520 "sintactico.tab.c"
+#line 1627 "sintactico.tab.c"
 
       default: break;
     }
@@ -1740,7 +1847,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 110 "sintactico.y"
+#line 175 "sintactico.y"
 
 
 void yyerror(const char *s) {
@@ -1769,6 +1876,43 @@ void imprimirCabecera(){
     printf("# Seccion de datos\n");
     printf("\t.data\n\n");
     imprimirLS(tabSimb);
+}
+
+char * obtenerReg() {
+    for (int i = 0; i < 10; i++) {
+        if (regs[i] == 0) {
+            regs[i] = 1;
+            return regsDevolver[i];
+        }
+    }
+    fprintf(stderr, "ERROR: registros temporales agotados\n");
+    return "";
+}
+
+char * concatena(char *a, char *b) {
+    char *res = malloc(strlen(a) + strlen(b) + 1);
+    strcpy(res, a);
+    strcat(res, b);
+    return res;
+}
+
+void liberarReg(char * reg) {
+    // Obtener el tercer caracter del registro, pasarlo a numero y liberar en el array de registros
+    int num = reg[2] - '0';
+    regs[num] = 0;
+}
+
+void imprimirCodigo(ListaC codigo) {
+    PosicionListaC p = inicioLC(codigo);
+    while (p != finalLC(codigo)) {
+        Operacion oper = recuperaLC(codigo,p);
+        printf("%s",oper.op);
+        if (oper.res) printf(" %s",oper.res);
+        if (oper.arg1) printf(",%s",oper.arg1);
+        if (oper.arg2) printf(",%s",oper.arg2);
+        printf("\n");
+        p = siguienteLC(codigo,p);
+    }
 }
 
 int main(int argc, char *argv[]) {

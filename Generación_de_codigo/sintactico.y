@@ -1,7 +1,9 @@
 %define parse.error verbose
 %{
 #include <stdio.h>
+#include <string.h>
 #include "listaSimbolos.h"
+#include "listaCodigo.h"
 #include <stdlib.h>
 void yyerror(const char *s);
 extern int yylex();
@@ -19,6 +21,12 @@ extern char *yytext;
 extern FILE *yyin;
 extern int yyparse();
 extern int yyleng();
+int regs[10] = {0,0,0,0,0,0,0,0,0,0};
+char * regsDevolver[10] = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
+char * obtenerReg();
+char * concatena();
+void liberarReg(char * reg);
+void imprimirCodigo(ListaC codigo);
 %}
 
 %code requires{
@@ -97,14 +105,71 @@ read_list: ID                                                       { if(!perten
                                                                       else if(esConstante($3)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }  
          ;
 
-expression: expression PLUSOP expression
-          | expression MINUSOP expression
-          | expression PRODOP expression
-          | expression DIVOP expression
-          | MINUSOP expression %prec UMENOS
-          | LPAREN expression RPAREN
-          | ID                                                       { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; } }
-          | INTLITERAL
+expression: expression PLUSOP expression       {$$ = $1;
+                                                concatenaLC($$, $3);
+                                                Operacion oper;
+                                                oper.op = "add";
+                                                oper.res = recuperaResLC($1);
+                                                oper.arg1 = recuperaResLC($1);
+                                                oper.arg2 = recuperaResLC($3);
+                                                insertaLC($$, finalLC($$), oper);
+                                                liberaLC($3);
+                                                liberarReg(oper.arg2);}
+          | expression MINUSOP expression      {$$ = $1;
+                                                concatenaLC($$, $3);
+                                                Operacion oper;
+                                                oper.op = "sub";
+                                                oper.res = recuperaResLC($1);
+                                                oper.arg1 = recuperaResLC($1);
+                                                oper.arg2 = recuperaResLC($3);
+                                                insertaLC($$, finalLC($$), oper);
+                                                liberaLC($3);
+                                                liberarReg(oper.arg2);} 
+          | expression PRODOP expression       {$$ = $1;
+                                                concatenaLC($$, $3);
+                                                Operacion oper;
+                                                oper.op = "mul";
+                                                oper.res = recuperaResLC($1);
+                                                oper.arg1 = recuperaResLC($1);
+                                                oper.arg2 = recuperaResLC($3);
+                                                insertaLC($$, finalLC($$), oper);
+                                                liberaLC($3);
+                                                liberarReg(oper.arg2);}
+          | expression DIVOP expression        {$$ = $1;
+                                                concatenaLC($$, $3);
+                                                Operacion oper;
+                                                oper.op = "div";
+                                                oper.res = recuperaResLC($1);
+                                                oper.arg1 = recuperaResLC($1);
+                                                oper.arg2 = recuperaResLC($3);
+                                                insertaLC($$, finalLC($$), oper);
+                                                liberaLC($3);
+                                                liberarReg(oper.arg2);}
+          | MINUSOP expression %prec UMENOS    {$$ = $2;
+                                                Operacion oper;
+                                                oper.op = "neg";
+                                                oper.res = recuperaResLC($2);
+                                                oper.arg1 = recuperaResLC($2);
+                                                oper.arg2 = NULL;
+                                                insertaLC($$, finalLC($$), oper);} 
+          | LPAREN expression RPAREN           {$$ = $2;}
+          | ID                                 {if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; } 
+                                                $$ = creaLC();
+                                                Operacion oper;
+                                                oper.op = "lw";
+                                                oper.res = obtenerReg();
+                                                oper.arg1 = concatena("_",$1);
+                                                oper.arg2 = NULL;
+                                                insertaLC($$, finalLC($$), oper);
+                                                guardaResLC($$, oper.res);}
+          | INTLITERAL                         {$$ = creaLC();
+                                                Operacion oper;
+                                                oper.op = "li";
+                                                oper.res = obtenerReg();
+                                                oper.arg1 = $1;
+                                                oper.arg2 = NULL;
+                                                insertaLC($$, finalLC($$), oper);
+                                                guardaResLC($$, oper.res);}
           ;
 
 %%
@@ -135,6 +200,43 @@ void imprimirCabecera(){
     printf("# Seccion de datos\n");
     printf("\t.data\n\n");
     imprimirLS(tabSimb);
+}
+
+char * obtenerReg() {
+    for (int i = 0; i < 10; i++) {
+        if (regs[i] == 0) {
+            regs[i] = 1;
+            return regsDevolver[i];
+        }
+    }
+    fprintf(stderr, "ERROR: registros temporales agotados\n");
+    return "";
+}
+
+char * concatena(char *a, char *b) {
+    char *res = malloc(strlen(a) + strlen(b) + 1);
+    strcpy(res, a);
+    strcat(res, b);
+    return res;
+}
+
+void liberarReg(char * reg) {
+    // Obtener el tercer caracter del registro, pasarlo a numero y liberar en el array de registros
+    int num = reg[2] - '0';
+    regs[num] = 0;
+}
+
+void imprimirCodigo(ListaC codigo) {
+    PosicionListaC p = inicioLC(codigo);
+    while (p != finalLC(codigo)) {
+        Operacion oper = recuperaLC(codigo,p);
+        printf("%s",oper.op);
+        if (oper.res) printf(" %s",oper.res);
+        if (oper.arg1) printf(",%s",oper.arg1);
+        if (oper.arg2) printf(",%s",oper.arg2);
+        printf("\n");
+        p = siguienteLC(codigo,p);
+    }
 }
 
 int main(int argc, char *argv[]) {
