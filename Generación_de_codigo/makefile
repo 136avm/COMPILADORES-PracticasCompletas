@@ -1,5 +1,5 @@
 miCompilador :	sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c
-	gcc sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c -lfl -o miCompilador
+	gcc -g sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c -lfl -o miCompilador
 
 sintactico.tab.c :	sintactico.y listaSimbolos.h listaCodigo.h
 	bison -d sintactico.y

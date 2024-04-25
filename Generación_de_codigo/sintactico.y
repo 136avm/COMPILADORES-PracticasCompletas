@@ -34,6 +34,8 @@ char * nuevaEtiqueta() {
     asprintf(&aux, "$l%d", contadorEtiq++);
     return aux;
 }
+char * intToChar();
+void imprimirCabecera();
 %}
 
 %code requires{
@@ -46,7 +48,7 @@ char * nuevaEtiqueta() {
     ListaC codigo;
 }
 
-%type <codigo> expression statement statement_list print_item print_list read_list;
+%type <codigo> expression statement statement_list print_item print_list read_list declarations identifier_list identifier;
 
 %token LPAREN RPAREN ASSIGNOP PLUSOP MINUSOP PRODOP DIVOP UMENOS LBRACE RBRACE SEMICOLON COMMA VAR CONST IF ELSE WHILE PRINT READ
 %token <entero> INTLITERAL
@@ -57,28 +59,63 @@ char * nuevaEtiqueta() {
 %left UMENOS
 %%
 
-program: { tabSimb = creaLS(); } ID LPAREN RPAREN LBRACE declarations statement_list RBRACE
+program: { tabSimb = creaLS(); } ID LPAREN RPAREN LBRACE declarations statement_list RBRACE {imprimirCabecera();
+                                                                                            concatenaLC($6, $7);
+                                                                                            Operacion oper;
+                                                                                            oper.op = "li";
+                                                                                            oper.res = "$v0";
+                                                                                            oper.arg1 = "10";
+                                                                                            oper.arg2 = NULL;
+                                                                                            insertaLC($6, finalLC($6), oper);
+                                                                                            Operacion oper2;
+                                                                                            oper2.op = "syscall";
+                                                                                            oper2.res = NULL;
+                                                                                            oper2.arg1 = NULL;
+                                                                                            oper2.arg2 = NULL;
+                                                                                            insertaLC($6, finalLC($6), oper2);
+                                                                                            imprimirCodigo($6);
+                                                                                            liberaLC($6);
+                                                                                            liberaLC($7);
+                                                                                            liberaLS(tabSimb);}
        | error LBRACE declarations statement_list RBRACE
        ;
 
-declarations: declarations VAR { tipo=VARIABLE; } identifier_list SEMICOLON
-            | declarations CONST { tipo=CONSTANTE; } identifier_list SEMICOLON
+declarations: declarations VAR { tipo=VARIABLE; } identifier_list SEMICOLON     { $$ = $1;
+                                                                                  concatenaLC($$, $4);
+                                                                                  liberaLC($4);}
+            | declarations CONST { tipo=CONSTANTE; } identifier_list SEMICOLON  { $$ = $1;
+                                                                                  concatenaLC($$, $4);
+                                                                                  liberaLC($4);}
             | error SEMICOLON
-            | /* lambda */
+            | /* lambda */  { $$ = creaLC(); }
             ;
 
-identifier_list: identifier
-               | identifier_list COMMA identifier
+identifier_list: identifier                         { $$ = $1; }
+               | identifier_list COMMA identifier   { $$ = $1;
+                                                      concatenaLC($$, $3);
+                                                      liberaLC($3);}
                ;
 
 identifier: ID                          { if(!perteneceTS($1)) {insertar($1, tipo);}
-                                          else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
+                                          else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } 
+                                          $$ = creaLC(); }
           | ID ASSIGNOP expression      { if(!perteneceTS($1)) {insertar($1, tipo);}
-                                          else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } }
+                                          else {fprintf(stderr, "ERROR SEMÁNTICO, en la línea %d, ID ya declarado.\n", yylineno); numErroresSemanticos++; } 
+                                          $$ = $3;
+                                          Operacion oper;
+                                          oper.op = "sw";
+                                          oper.res = recuperaResLC($3);
+                                          oper.arg1 = concatena("_",$1);
+                                          oper.arg2 = NULL;
+                                          insertaLC($$, finalLC($$), oper);
+                                          liberaLC($3);
+                                          liberarReg(oper.res); }
           ;
 
-statement_list: statement_list statement
-              | /* lambda */
+statement_list: statement_list statement                            { $$ = $1;
+                                                                      concatenaLC($$, $2);
+                                                                      liberaLC($2);}
+              | /* lambda */                                        { $$ = creaLC(); }
               ;
 
 statement: ID ASSIGNOP expression SEMICOLON                         { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
@@ -92,10 +129,86 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       insertaLC($$, finalLC($$), oper);
                                                                       liberaLC($3);
                                                                       liberarReg(oper.res); }
-         | LBRACE statement_list RBRACE
-         | IF LPAREN expression RPAREN statement ELSE statement
-         | IF LPAREN expression RPAREN statement
-         | WHILE LPAREN expression RPAREN statement
+         | LBRACE statement_list RBRACE                             { $$ = $2; }
+         | IF LPAREN expression RPAREN statement ELSE statement     { $$ = $3;
+                                                                      Operacion oper;
+                                                                      oper.op = "beqz";
+                                                                      oper.res = recuperaResLC($3);
+                                                                      oper.arg1 = nuevaEtiqueta();
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      concatenaLC($$, $5);
+                                                                      Operacion oper2;
+                                                                      oper2.op = "b";
+                                                                      oper2.res = nuevaEtiqueta();
+                                                                      oper2.arg1 = NULL;
+                                                                      oper2.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper2);
+                                                                      Operacion oper3;
+                                                                      oper3.op = concatena(oper.arg1,":");
+                                                                      oper3.res = NULL;
+                                                                      oper3.arg1 = NULL;
+                                                                      oper3.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper3);
+                                                                      concatenaLC($$, $7);
+                                                                      Operacion oper4;
+                                                                      oper4.op = concatena(oper2.res,":");
+                                                                      oper4.res = NULL;
+                                                                      oper4.arg1 = NULL;
+                                                                      oper4.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper4);
+                                                                      liberaLC($3);
+                                                                      liberarReg(oper.res);
+                                                                      liberaLC($5);
+                                                                      liberaLC($7); }
+         | IF LPAREN expression RPAREN statement                    { $$ = $3;
+                                                                      Operacion oper;
+                                                                      oper.op = "beqz";
+                                                                      oper.res = recuperaResLC($3);
+                                                                      oper.arg1 = nuevaEtiqueta();
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      concatenaLC($$, $5);
+                                                                      Operacion oper2;
+                                                                      oper2.op = concatena(oper.arg1,":");
+                                                                      oper2.res = NULL;
+                                                                      oper2.arg1 = NULL;
+                                                                      oper2.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper2);
+                                                                      liberaLC($3);
+                                                                      liberarReg(oper.res);
+                                                                      liberaLC($5); }
+         | WHILE LPAREN expression RPAREN statement                 { $$ = creaLC();
+                                                                      Operacion oper;
+                                                                      char * etiqueta = nuevaEtiqueta();
+                                                                      oper.op = concatena(etiqueta,":");
+                                                                      oper.res = NULL;
+                                                                      oper.arg1 = NULL;
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      concatenaLC($$, $3);
+                                                                      Operacion oper2;
+                                                                      oper2.op = "beqz";
+                                                                      oper2.res = recuperaResLC($3);
+                                                                      oper2.arg1 = nuevaEtiqueta();
+                                                                      oper2.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper2);
+                                                                      concatenaLC($$, $5);
+                                                                      Operacion oper3;
+                                                                      oper3.op = "b";
+                                                                      oper3.res = etiqueta;
+                                                                      oper3.arg1 = NULL;
+                                                                      oper3.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper3);
+                                                                      Operacion oper4;
+                                                                      oper4.op = concatena(oper2.arg1,":");
+                                                                      oper4.res = NULL;
+                                                                      oper4.arg1 = NULL;
+                                                                      oper4.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper4);
+                                                                      liberaLC($3);
+                                                                      liberarReg(oper2.res);
+                                                                      liberaLC($5); }
          | PRINT LPAREN print_list RPAREN SEMICOLON                 { $$ = $3; 
                                                                       liberaLC($3); }
          | READ LPAREN read_list RPAREN SEMICOLON                   { $$ = $3; 
@@ -263,7 +376,7 @@ expression: expression PLUSOP expression       {$$ = $1;
                                                 Operacion oper;
                                                 oper.op = "li";
                                                 oper.res = obtenerReg();
-                                                oper.arg1 = $1;
+                                                oper.arg1 = intToChar($1);
                                                 oper.arg2 = NULL;
                                                 insertaLC($$, finalLC($$), oper);
                                                 guardaResLC($$, oper.res);}
@@ -334,6 +447,12 @@ void imprimirCodigo(ListaC codigo) {
         printf("\n");
         p = siguienteLC(codigo,p);
     }
+}
+
+char * intToChar(int entero) {
+    char * res;
+    asprintf(&res, "%d", entero);
+    return res;
 }
 
 int main(int argc, char *argv[]) {
