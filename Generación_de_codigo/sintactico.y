@@ -1,5 +1,6 @@
 %define parse.error verbose
 %{
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include "listaSimbolos.h"
@@ -27,6 +28,12 @@ char * obtenerReg();
 char * concatena();
 void liberarReg(char * reg);
 void imprimirCodigo(ListaC codigo);
+int contadorEtiq = 1;
+char * nuevaEtiqueta() {
+    char * aux;
+    asprintf(&aux, "$l%d", contadorEtiq++);
+    return aux;
+}
 %}
 
 %code requires{
@@ -39,7 +46,7 @@ void imprimirCodigo(ListaC codigo);
     ListaC codigo;
 }
 
-%type <codigo> expression;
+%type <codigo> expression statement statement_list print_item print_list read_list;
 
 %token LPAREN RPAREN ASSIGNOP PLUSOP MINUSOP PRODOP DIVOP UMENOS LBRACE RBRACE SEMICOLON COMMA VAR CONST IF ELSE WHILE PRINT READ
 %token <entero> INTLITERAL
@@ -75,13 +82,24 @@ statement_list: statement_list statement
               ;
 
 statement: ID ASSIGNOP expression SEMICOLON                         { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
-                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } }
+                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno);numErroresSemanticos++;  } 
+                                                                      $$ = $3;
+                                                                      Operacion oper;
+                                                                      oper.op = "sw";
+                                                                      oper.res = recuperaResLC($3);
+                                                                      oper.arg1 = concatena("_",$1);
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      liberaLC($3);
+                                                                      liberarReg(oper.res); }
          | LBRACE statement_list RBRACE
          | IF LPAREN expression RPAREN statement ELSE statement
          | IF LPAREN expression RPAREN statement
          | WHILE LPAREN expression RPAREN statement
-         | PRINT LPAREN print_list RPAREN SEMICOLON
-         | READ LPAREN read_list RPAREN SEMICOLON
+         | PRINT LPAREN print_list RPAREN SEMICOLON                 { $$ = $3; 
+                                                                      liberaLC($3); }
+         | READ LPAREN read_list RPAREN SEMICOLON                   { $$ = $3; 
+                                                                      liberaLC($3); }
          | error SEMICOLON
          | LBRACE error RBRACE
          | IF LPAREN error RPAREN statement ELSE statement
@@ -91,18 +109,97 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
          | READ LPAREN error RPAREN SEMICOLON
          ;
 
-print_list: print_item
-          | print_list COMMA print_item
+print_list: print_item  { $$ = $1; }
+          | print_list COMMA print_item { $$ = $1;
+                                          concatenaLC($$, $3);
+                                          liberaLC($3); }
           ;
 
-print_item: expression
-          | CADENA      { insertar($1, STRING); contCadenas++; }
+print_item: expression  { $$ = $1;
+                          Operacion oper;
+                          oper.op = "li";
+                          oper.res = "$v0";
+                          oper.arg1 = "1";
+                          oper.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper);
+                          Operacion oper2;
+                          oper2.op = "move";
+                          oper2.res = "$a0";
+                          oper2.arg1 = recuperaResLC($1);
+                          oper2.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper2);
+                          Operacion oper3;
+                          oper3.op = "syscall";
+                          oper3.res = NULL;
+                          oper3.arg1 = NULL;
+                          oper3.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper3);
+                          liberaLC($1);
+                          liberarReg(oper2.arg1); }
+          | CADENA      { insertar($1, STRING); contCadenas++;
+                          $$ = creaLC(); 
+                          Operacion oper;
+                          oper.op = "li";
+                          oper.res = "$v0";
+                          oper.arg1 = "4";
+                          oper.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper);
+                          Operacion oper2;
+                          oper2.op = "la";
+                          oper2.res = "$a0";
+                          oper2.arg1 = concatena("str",contCadenas+'0');
+                          oper2.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper2);
+                          Operacion oper3;
+                          oper3.op = "syscall";
+                          oper3.res = NULL;
+                          oper3.arg1 = NULL;
+                          oper3.arg2 = NULL;
+                          insertaLC($$, finalLC($$), oper3); }
           ;
 
 read_list: ID                                                       { if(!perteneceTS($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
-                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }                              
+                                                                      else if(esConstante($1)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } 
+                                                                      $$ = creaLC();
+                                                                      Operacion oper;
+                                                                      oper.op = "li";
+                                                                      oper.res = "$v0";
+                                                                      oper.arg1 = "5";
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      Operacion oper2;
+                                                                      oper2.op = "syscall";
+                                                                      oper2.res = NULL;
+                                                                      oper2.arg1 = NULL;
+                                                                      oper2.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper2);
+                                                                      Operacion oper3;
+                                                                      oper3.op = "sw";
+                                                                      oper3.res = recuperaResLC($$);
+                                                                      oper3.arg1 = concatena("_",$1);
+                                                                      oper3.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper3);}                              
          | read_list COMMA ID                                       { if(!perteneceTS($3)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, ID no declarado.\n", yylineno); numErroresSemanticos++; }
-                                                                      else if(esConstante($3)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; } }  
+                                                                      else if(esConstante($3)) {fprintf(stderr, "ERROR SEMÁNTICO en la línea %d, CONST no puede ser reasignado.\n", yylineno); numErroresSemanticos++; }
+                                                                      $$ = $1;
+                                                                      Operacion oper;
+                                                                      oper.op = "li";
+                                                                      oper.res = "$v0";
+                                                                      oper.arg1 = "5";
+                                                                      oper.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper);
+                                                                      Operacion oper2;
+                                                                      oper2.op = "syscall";
+                                                                      oper2.res = NULL;
+                                                                      oper2.arg1 = NULL;
+                                                                      oper2.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper2);
+                                                                      Operacion oper3;
+                                                                      oper3.op = "sw";
+                                                                      oper3.res = recuperaResLC($$);
+                                                                      oper3.arg1 = concatena("_",$3);
+                                                                      oper3.arg2 = NULL;
+                                                                      insertaLC($$, finalLC($$), oper3);}  
          ;
 
 expression: expression PLUSOP expression       {$$ = $1;
