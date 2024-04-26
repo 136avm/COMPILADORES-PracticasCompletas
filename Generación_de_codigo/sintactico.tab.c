@@ -2237,27 +2237,19 @@ int main(int argc, char *argv[]) {
     yyparse();
     fclose(fitch);
 
-    if (numErroresSintacticos == 0) {
-        printf("El análisis sintáctico fue exitoso\n");
-    } else {
+    if (numErroresSintacticos == 0) {} else {
         printf("El análisis sintáctico encontró %d errores\n", numErroresSintacticos);
     }
 
-    if (numErroresLexicos == 0) {
-        printf("El análisis léxico fue exitoso\n");
-    } else {
+    if (numErroresLexicos == 0) {} else {
         printf("El análisis léxico encontró %d errores\n", numErroresLexicos);
     }
 
-    if (numErroresSemanticos == 0) {
-        printf("El análisis semántico fue exitoso\n");
-    } else {
+    if (numErroresSemanticos == 0) {} else {
         printf("El análisis semántico encontró %d errores\n", numErroresSemanticos);
     }
 
-    if (numErroresSintacticos == 0 && numErroresLexicos == 0 && numErroresSemanticos == 0) {
-        printf("El análisis fue exitoso\n");
-    } else {
+    if (numErroresSintacticos == 0 && numErroresLexicos == 0 && numErroresSemanticos == 0) {} else {
         printf("El análisis encontró %d errores\n", numErroresSintacticos + numErroresLexicos + numErroresSemanticos);
     }
 
