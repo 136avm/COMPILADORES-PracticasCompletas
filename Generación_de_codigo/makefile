@@ -1,5 +1,5 @@
-miCompilador :	sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c
-	gcc -g sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c -lfl -o miCompilador
+miniC :	sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c
+	gcc sintactico.tab.c lex.yy.c listaSimbolos.c listaCodigo.c -lfl -o miniC
 
 sintactico.tab.c :	sintactico.y listaSimbolos.h listaCodigo.h
 	bison -d sintactico.y
@@ -10,14 +10,14 @@ lex.yy.c :	lexico.l
 clean :
 	rm -f lex.yy.c sintactico.tab.* salida
 
-test :	miCompilador test_funcional.txt
-	./miCompilador test_funcional.txt
+test :	miniC test_funcional.txt
+	./miniC test_funcional.txt
 
-testLexico : miCompilador test_lexico.txt
-	./miCompilador test_lexico.txt
+testLexico : miniC test_lexico.txt
+	./miniC test_lexico.txt
 
-testSintactico : miCompilador test_sintactico.txt
-	./miCompilador test_sintactico.txt
+testSintactico : miniC test_sintactico.txt
+	./miniC test_sintactico.txt
 
-testSemantico : miCompilador test_semantico.txt
-	./miCompilador test_semantico.txt
+testSemantico : miniC test_semantico.txt
+	./miniC test_semantico.txt

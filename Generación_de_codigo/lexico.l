@@ -30,6 +30,7 @@ read                                return READ;
                                         numErroresLexicos++;
                                     } };
 {entero}                            { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
+                                        yylval.entero = atoll(yytext);
                                         return INTLITERAL;
                                     } else {
                                         fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);

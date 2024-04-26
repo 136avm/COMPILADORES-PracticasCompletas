@@ -13,7 +13,7 @@ int numErroresSintacticos = 0;
 extern int numErroresLexicos;
 Lista tabSimb;
 Tipo tipo;
-int  contCadenas = 1;
+int  contCadenas = 0;
 void insertar(char *id, Tipo tipo);
 int perteneceTS(char *id);
 int esConstante(char *id);
@@ -34,7 +34,16 @@ char * nuevaEtiqueta() {
     asprintf(&aux, "$l%d", contadorEtiq++);
     return aux;
 }
-char * intToChar();
+char * creaCadena() {
+    char * aux;
+    asprintf(&aux, "$str%d", contCadenas);
+    return aux;
+}
+char * argToString(int arg) {
+    char * aux;
+    asprintf(&aux, "%d", arg);
+    return aux;
+}
 void imprimirCabecera();
 %}
 
@@ -61,18 +70,6 @@ void imprimirCabecera();
 
 program: { tabSimb = creaLS(); } ID LPAREN RPAREN LBRACE declarations statement_list RBRACE {imprimirCabecera();
                                                                                             concatenaLC($6, $7);
-                                                                                            Operacion oper;
-                                                                                            oper.op = "li";
-                                                                                            oper.res = "$v0";
-                                                                                            oper.arg1 = "10";
-                                                                                            oper.arg2 = NULL;
-                                                                                            insertaLC($6, finalLC($6), oper);
-                                                                                            Operacion oper2;
-                                                                                            oper2.op = "syscall";
-                                                                                            oper2.res = NULL;
-                                                                                            oper2.arg1 = NULL;
-                                                                                            oper2.arg2 = NULL;
-                                                                                            insertaLC($6, finalLC($6), oper2);
                                                                                             imprimirCodigo($6);
                                                                                             liberaLC($6);
                                                                                             liberaLC($7);
@@ -93,7 +90,7 @@ declarations: declarations VAR { tipo=VARIABLE; } identifier_list SEMICOLON     
 identifier_list: identifier                         { $$ = $1; }
                | identifier_list COMMA identifier   { $$ = $1;
                                                       concatenaLC($$, $3);
-                                                      liberaLC($3);}
+                                                      liberaLC($3); }
                ;
 
 identifier: ID                          { if(!perteneceTS($1)) {insertar($1, tipo);}
@@ -108,7 +105,7 @@ identifier: ID                          { if(!perteneceTS($1)) {insertar($1, tip
                                           oper.arg1 = concatena("_",$1);
                                           oper.arg2 = NULL;
                                           insertaLC($$, finalLC($$), oper);
-                                          liberaLC($3);
+                                          guardaResLC($$, oper.res);
                                           liberarReg(oper.res); }
           ;
 
@@ -127,7 +124,6 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       oper.arg1 = concatena("_",$1);
                                                                       oper.arg2 = NULL;
                                                                       insertaLC($$, finalLC($$), oper);
-                                                                      liberaLC($3);
                                                                       liberarReg(oper.res); }
          | LBRACE statement_list RBRACE                             { $$ = $2; }
          | IF LPAREN expression RPAREN statement ELSE statement     { $$ = $3;
@@ -157,10 +153,7 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       oper4.arg1 = NULL;
                                                                       oper4.arg2 = NULL;
                                                                       insertaLC($$, finalLC($$), oper4);
-                                                                      liberaLC($3);
-                                                                      liberarReg(oper.res);
-                                                                      liberaLC($5);
-                                                                      liberaLC($7); }
+                                                                      liberarReg(oper.res); }
          | IF LPAREN expression RPAREN statement                    { $$ = $3;
                                                                       Operacion oper;
                                                                       oper.op = "beqz";
@@ -175,9 +168,7 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       oper2.arg1 = NULL;
                                                                       oper2.arg2 = NULL;
                                                                       insertaLC($$, finalLC($$), oper2);
-                                                                      liberaLC($3);
-                                                                      liberarReg(oper.res);
-                                                                      liberaLC($5); }
+                                                                      liberarReg(oper.res); }
          | WHILE LPAREN expression RPAREN statement                 { $$ = creaLC();
                                                                       Operacion oper;
                                                                       char * etiqueta = nuevaEtiqueta();
@@ -206,13 +197,9 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       oper4.arg1 = NULL;
                                                                       oper4.arg2 = NULL;
                                                                       insertaLC($$, finalLC($$), oper4);
-                                                                      liberaLC($3);
-                                                                      liberarReg(oper2.res);
-                                                                      liberaLC($5); }
-         | PRINT LPAREN print_list RPAREN SEMICOLON                 { $$ = $3; 
-                                                                      liberaLC($3); }
-         | READ LPAREN read_list RPAREN SEMICOLON                   { $$ = $3; 
-                                                                      liberaLC($3); }
+                                                                      liberarReg(oper2.res); }
+         | PRINT LPAREN print_list RPAREN SEMICOLON                 { $$ = $3; }
+         | READ LPAREN read_list RPAREN SEMICOLON                   { $$ = $3; }
          | error SEMICOLON
          | LBRACE error RBRACE
          | IF LPAREN error RPAREN statement ELSE statement
@@ -247,7 +234,6 @@ print_item: expression  { $$ = $1;
                           oper3.arg1 = NULL;
                           oper3.arg2 = NULL;
                           insertaLC($$, finalLC($$), oper3);
-                          liberaLC($1);
                           liberarReg(oper2.arg1); }
           | CADENA      { insertar($1, STRING); contCadenas++;
                           $$ = creaLC(); 
@@ -260,7 +246,7 @@ print_item: expression  { $$ = $1;
                           Operacion oper2;
                           oper2.op = "la";
                           oper2.res = "$a0";
-                          oper2.arg1 = concatena("str",contCadenas+'0');
+                          oper2.arg1 = creaCadena();
                           oper2.arg2 = NULL;
                           insertaLC($$, finalLC($$), oper2);
                           Operacion oper3;
@@ -376,7 +362,7 @@ expression: expression PLUSOP expression       {$$ = $1;
                                                 Operacion oper;
                                                 oper.op = "li";
                                                 oper.res = obtenerReg();
-                                                oper.arg1 = intToChar($1);
+                                                oper.arg1 = argToString($1);
                                                 oper.arg2 = NULL;
                                                 insertaLC($$, finalLC($$), oper);
                                                 guardaResLC($$, oper.res);}
@@ -437,9 +423,15 @@ void liberarReg(char * reg) {
 }
 
 void imprimirCodigo(ListaC codigo) {
+    printf("\n##################\n");
+    printf("# Seccion de código\n");
+    printf("\t.text\n");
+    printf("\t.globl main\n");
+    printf("main:\n");
     PosicionListaC p = inicioLC(codigo);
     while (p != finalLC(codigo)) {
         Operacion oper = recuperaLC(codigo,p);
+        if (oper.op[0] != '$') printf("\t");
         printf("%s",oper.op);
         if (oper.res) printf(" %s",oper.res);
         if (oper.arg1) printf(",%s",oper.arg1);
@@ -447,12 +439,10 @@ void imprimirCodigo(ListaC codigo) {
         printf("\n");
         p = siguienteLC(codigo,p);
     }
-}
-
-char * intToChar(int entero) {
-    char * res;
-    asprintf(&res, "%d", entero);
-    return res;
+    printf("##################\n");
+    printf("# Fin del programa\n");
+    printf("\tli $v0, 10\n");
+    printf("\tsyscall\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -492,10 +482,6 @@ int main(int argc, char *argv[]) {
     } else {
         printf("El análisis encontró %d errores\n", numErroresSintacticos + numErroresLexicos + numErroresSemanticos);
     }
-
-    printf("\nLa cabecera del código ensamblador es: \n\n");
-    imprimirCabecera();
-    liberaLS(tabSimb);
 
     return 0;
 }

@@ -877,6 +877,7 @@ case 12:
 YY_RULE_SETUP
 #line 32 "lexico.l"
 { if(atoll(yytext)>=-2147483648 && atoll(yytext)<=2147483648) {
+                                        yylval.entero = atoll(yytext);
                                         return INTLITERAL;
                                     } else {
                                         fprintf(stderr, "ERROR LÉXICO en la línea %d: \"%s\". El número entero debe estar entre -2^31 y 2^31.\n", yylineno,yytext);
@@ -885,85 +886,85 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 38 "lexico.l"
+#line 39 "lexico.l"
 { yylval.cadena = strdup(yytext); return CADENA; };
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 39 "lexico.l"
+#line 40 "lexico.l"
 return LPAREN;		
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 40 "lexico.l"
+#line 41 "lexico.l"
 return RPAREN;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 41 "lexico.l"
+#line 42 "lexico.l"
 return SEMICOLON;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 42 "lexico.l"
+#line 43 "lexico.l"
 return COMMA;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 43 "lexico.l"
+#line 44 "lexico.l"
 return ASSIGNOP;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 44 "lexico.l"
+#line 45 "lexico.l"
 return PLUSOP;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 45 "lexico.l"
+#line 46 "lexico.l"
 return MINUSOP;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 46 "lexico.l"
+#line 47 "lexico.l"
 return LBRACE;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 47 "lexico.l"
+#line 48 "lexico.l"
 return RBRACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 48 "lexico.l"
+#line 49 "lexico.l"
 return PRODOP;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 49 "lexico.l"
+#line 50 "lexico.l"
 return DIVOP;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 50 "lexico.l"
+#line 51 "lexico.l"
 { BEGIN(PANIC); error_buffer[error_buffer_index++] = yytext[0]; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 51 "lexico.l"
+#line 52 "lexico.l"
 { error_buffer[error_buffer_index++] = yytext[0]; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 52 "lexico.l"
+#line 53 "lexico.l"
 { error_buffer[error_buffer_index] = '\0'; fprintf(stderr, "ERROR LEXICO en la línea %d: Secuencia de caracteres no reconocidos encontrada: %s\n", yylineno, error_buffer); error_buffer_index = 0; BEGIN(INITIAL); yyless(0); numErroresLexicos++; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 53 "lexico.l"
+#line 54 "lexico.l"
 ECHO;
 	YY_BREAK
-#line 967 "lex.yy.c"
+#line 968 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(PANIC):
 	yyterminate();
@@ -1981,5 +1982,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 53 "lexico.l"
+#line 54 "lexico.l"
 
