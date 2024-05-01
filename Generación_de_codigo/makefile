@@ -21,3 +21,8 @@ testSintactico : miniC test_sintactico.txt
 
 testSemantico : miniC test_semantico.txt
 	./miniC test_semantico.txt
+
+testFinal : miniC test_funcional.txt
+	./miniC test_funcional.txt > test.s
+	spim -file test.s
+	rm test.s
