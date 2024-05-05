@@ -25,7 +25,7 @@ extern int yyleng();
 int regs[10] = {0,0,0,0,0,0,0,0,0,0};
 char * regsDevolver[10] = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
 char * obtenerReg();
-char * concatena();
+char * concatena(char *a, char *b);
 void liberarReg(char * reg);
 void imprimirCodigo(ListaC codigo);
 int contadorEtiq = 1;
@@ -74,7 +74,7 @@ program: { tabSimb = creaLS(); } ID LPAREN RPAREN LBRACE declarations statement_
                                                                                             liberaLC($6);
                                                                                             liberaLC($7);
                                                                                             liberaLS(tabSimb);}
-       | error LBRACE declarations statement_list RBRACE
+       /*| error LBRACE declarations statement_list RBRACE*/
        ;
 
 declarations: declarations VAR { tipo=VARIABLE; } identifier_list SEMICOLON     { $$ = $1;
@@ -83,7 +83,6 @@ declarations: declarations VAR { tipo=VARIABLE; } identifier_list SEMICOLON     
             | declarations CONST { tipo=CONSTANTE; } identifier_list SEMICOLON  { $$ = $1;
                                                                                   concatenaLC($$, $4);
                                                                                   liberaLC($4);}
-            | error SEMICOLON
             | /* lambda */  { $$ = creaLC(); }
             ;
 
@@ -200,13 +199,6 @@ statement: ID ASSIGNOP expression SEMICOLON                         { if(!perten
                                                                       liberarReg(oper2.res); }
          | PRINT LPAREN print_list RPAREN SEMICOLON                 { $$ = $3; }
          | READ LPAREN read_list RPAREN SEMICOLON                   { $$ = $3; }
-         | error SEMICOLON
-         | LBRACE error RBRACE
-         | IF LPAREN error RPAREN statement ELSE statement
-         | IF LPAREN error RPAREN statement
-         | WHILE LPAREN error RPAREN statement
-         | PRINT LPAREN error RPAREN SEMICOLON
-         | READ LPAREN error RPAREN SEMICOLON
          ;
 
 print_list: print_item  { $$ = $1; }
